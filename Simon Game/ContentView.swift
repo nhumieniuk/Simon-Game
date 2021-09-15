@@ -6,66 +6,85 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 struct ContentView: View {
     @State private var options = 0
     @State private var answers: [Int] = []
     @State private var count = -1
-    @State private var greenHighlight: Bool = false
-    @State private var yellowHighlight: Bool = false
-    @State private var redHighlight: Bool = false
-    @State private var blueHighlight: Bool = false
+    @State private var highScore = 0
+    @State private var highlight = [false, false, false, false]
+    @State var audioPlayer: AVAudioPlayer?
     var body: some View {
+        ZStack(alignment: .center)
+        {
         HStack(alignment: .top) {
             VStack(alignment: .leading)
             {
                     Rectangle()
-                        .fill(greenHighlight ? Color.black : Color.green)
+                        .fill(Color.green)
+                        .opacity(highlight[0] ? 1 : 0.4)
                         .onTapGesture {
                             options = 1
                             count += 1
                             click()
-                            greenHighlight = true
+                            highlight[0] = true
+                            playAudio(name: "1")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
-                                greenHighlight = false
+                                highlight[0] = false
                             })
                         }
                     Rectangle()
-                        .fill(yellowHighlight ? Color.black : Color.yellow)
+                        .fill(Color.yellow)
+                        .opacity(highlight[2] ? 1 : 0.4)
                         .onTapGesture {
                             options = 3
                             count += 1
                             click()
-                            yellowHighlight = true
+                            highlight[2] = true
+                            playAudio(name: "3")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
-                                yellowHighlight = false
+                                highlight[2] = false
                             })
                         }
             }
             VStack(alignment: .leading) {
                     Rectangle()
-                        .fill(redHighlight ? Color.black : Color.red)
+                        .fill(Color.red)
+                        .opacity(highlight[1] ? 1 : 0.4)
                         .onTapGesture {
                             options = 2
                             count += 1
                             click()
-                            redHighlight = true
+                            highlight[1] = true
+                            playAudio(name: "2")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
-                                redHighlight = false
+                                highlight[1] = false
                             })
                         }
                     Rectangle()
-                        .fill(blueHighlight ? Color.black : Color.blue)
+                        .fill(Color.blue)
+                        .opacity(highlight[3] ? 1 : 0.4)
                         .onTapGesture {
                             options = 4
                             count += 1
                             click()
-                            blueHighlight = true
+                            highlight[3] = true
+                            playAudio(name: "4")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
-                                blueHighlight = false
+                                highlight[3] = false
                             })
                         }
             }
+        }
+            Text("Simon")
+                .multilineTextAlignment(.center)
+                .padding()
+                .frame(width: 250, height: 250)
+                .background(Circle().fill(Color.black))
+                .font(Font.custom("impact", size: 72))
+                
+            .preferredColorScheme(.dark)
         }
         
     }
@@ -112,15 +131,10 @@ struct ContentView: View {
         count = -1
         options = 0
         answers.removeAll()
-        greenHighlight = true
-        yellowHighlight = true
-        redHighlight = true
-        blueHighlight = true
+        playAudio(name: "Lose")
+        (highlight[0], highlight[2], highlight[1], highlight[3]) = (true, true, true, true)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
-            greenHighlight = false
-            yellowHighlight = false
-            redHighlight = false
-            blueHighlight = false
+            (highlight[0], highlight[2], highlight[1], highlight[3]) = (false, false, false, false)
         })
         
     }
@@ -132,48 +146,56 @@ struct ContentView: View {
                 if(answers[i] == 1)
                 {
                     if(i > 0 && answers[i - 1] != 1){
-                    greenHighlight = true
+                    highlight[0] = true
+                        playAudio(name: "1")
                     }
                     else{
-                        greenHighlight = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
-                        greenHighlight = true
+                        highlight[0] = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: {
+                        highlight[0] = true
+                            playAudio(name: "1")
                         })
                     }
                 }
                 if(answers[i] == 2)
                 {
                     if(i > 0 && answers[i - 1] != 2){
-                    redHighlight = true
+                    highlight[1] = true
+                        playAudio(name: "2")
                     }
                     else{
-                        redHighlight = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
-                        redHighlight = true
+                        highlight[1] = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: {
+                        highlight[1] = true
+                            playAudio(name: "2")
                         })
                     }
                 }
                 if(answers[i] == 3)
                 {
                     if(i > 0 && answers[i - 1] != 3){
-                    yellowHighlight = true
+                    highlight[2] = true
+                        playAudio(name: "3")
                     }
                     else{
-                        yellowHighlight = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
-                        yellowHighlight = true
+                        highlight[2] = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: {
+                        highlight[2] = true
+                            playAudio(name: "3")
                         })
                     }
                 }
                 if(answers[i] == 4)
                 {
                     if(i > 0 && answers[i - 1] != 4){
-                    blueHighlight = true
+                    highlight[3] = true
+                        playAudio(name: "4")
                     }
                     else{
-                        blueHighlight = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
-                        blueHighlight = true
+                        highlight[3] = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: {
+                        highlight[3] = true
+                            playAudio(name: "4")
                         })
                     }
                 }
@@ -181,10 +203,10 @@ struct ContentView: View {
                 i += 1
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    greenHighlight = false
-                    redHighlight = false
-                    yellowHighlight = false
-                    blueHighlight = false
+                    highlight[0] = false
+                    highlight[1] = false
+                    highlight[2] = false
+                    highlight[3] = false
                     nextIteration()
                 }
             }
@@ -192,7 +214,19 @@ struct ContentView: View {
 
         nextIteration()
     }
-    
+    func playAudio(name: String)
+    {
+        if let audioURL = Bundle.main.url(forResource: name, withExtension: "wav") {
+                do {
+                    try self.audioPlayer = AVAudioPlayer(contentsOf: audioURL)
+                    self.audioPlayer?.prepareToPlay()
+                    self.audioPlayer?.play()
+                    } catch {
+                        print("Couldn't play audio. Error: \(error)")
+                    }
+            
+        }
+    }
 }
 
 
