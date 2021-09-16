@@ -13,7 +13,7 @@ struct ContentView: View {
     @State private var answers: [Int] = []
     @State private var count = -1
     @State private var highScore = 0
-    @State private var highlight = [false, false, false, false]
+    @State private var highlight = [false, false, false, false, false]
     @State var audioPlayer: AVAudioPlayer?
     var body: some View {
         ZStack(alignment: .center)
@@ -29,7 +29,7 @@ struct ContentView: View {
                             count += 1
                             click()
                             highlight[0] = true
-                            playAudio(name: "1")
+                            playAudio(name: "0")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                                 highlight[0] = false
                             })
@@ -42,7 +42,7 @@ struct ContentView: View {
                             count += 1
                             click()
                             highlight[2] = true
-                            playAudio(name: "3")
+                            playAudio(name: "2")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                                 highlight[2] = false
                             })
@@ -57,7 +57,7 @@ struct ContentView: View {
                             count += 1
                             click()
                             highlight[1] = true
-                            playAudio(name: "2")
+                            playAudio(name: "1")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                                 highlight[1] = false
                             })
@@ -70,7 +70,7 @@ struct ContentView: View {
                             count += 1
                             click()
                             highlight[3] = true
-                            playAudio(name: "4")
+                            playAudio(name: "3")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                                 highlight[3] = false
                             })
@@ -143,63 +143,20 @@ struct ContentView: View {
         var i = 0
         func nextIteration() {
             if i < times {
-                if(answers[i] == 1)
-                {
-                    if(i > 0 && answers[i - 1] != 1){
-                    highlight[0] = true
-                        playAudio(name: "1")
+                let highlightNumber = answers[i] - 1
+                print(answers[i])
+                    if(i > 0 && answers[i - 1] != answers[i]){
+                        highlight[(answers[i]) - 1] = true
+                        playAudio(name: "\(highlightNumber)")
                     }
                     else{
-                        highlight[0] = false
+                        print(highlight[(answers[i]) - 1])
+                        highlight[(answers[i]) - 1] = false
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: {
-                        highlight[0] = true
-                            playAudio(name: "1")
+                           highlight[highlightNumber] = true //game crashes if highlight[(answers[i]) - 1] is used?????????? what
+                            playAudio(name: "\(highlightNumber)")
                         })
                     }
-                }
-                if(answers[i] == 2)
-                {
-                    if(i > 0 && answers[i - 1] != 2){
-                    highlight[1] = true
-                        playAudio(name: "2")
-                    }
-                    else{
-                        highlight[1] = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: {
-                        highlight[1] = true
-                            playAudio(name: "2")
-                        })
-                    }
-                }
-                if(answers[i] == 3)
-                {
-                    if(i > 0 && answers[i - 1] != 3){
-                    highlight[2] = true
-                        playAudio(name: "3")
-                    }
-                    else{
-                        highlight[2] = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: {
-                        highlight[2] = true
-                            playAudio(name: "3")
-                        })
-                    }
-                }
-                if(answers[i] == 4)
-                {
-                    if(i > 0 && answers[i - 1] != 4){
-                    highlight[3] = true
-                        playAudio(name: "4")
-                    }
-                    else{
-                        highlight[3] = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: {
-                        highlight[3] = true
-                            playAudio(name: "4")
-                        })
-                    }
-                }
-
                 i += 1
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
