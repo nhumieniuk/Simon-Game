@@ -27,9 +27,9 @@ struct ContentView: View {
                         .onTapGesture {
                             options = 1
                             count += 1
+                            playAudio(name: "0")
                             click()
                             highlight[0] = true
-                            playAudio(name: "0")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                                 highlight[0] = false
                             })
@@ -40,9 +40,9 @@ struct ContentView: View {
                         .onTapGesture {
                             options = 3
                             count += 1
+                            playAudio(name: "2")
                             click()
                             highlight[2] = true
-                            playAudio(name: "2")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                                 highlight[2] = false
                             })
@@ -55,9 +55,9 @@ struct ContentView: View {
                         .onTapGesture {
                             options = 2
                             count += 1
+                            playAudio(name: "1")
                             click()
                             highlight[1] = true
-                            playAudio(name: "1")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                                 highlight[1] = false
                             })
@@ -68,9 +68,9 @@ struct ContentView: View {
                         .onTapGesture {
                             options = 4
                             count += 1
+                            playAudio(name: "3")
                             click()
                             highlight[3] = true
-                            playAudio(name: "3")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                                 highlight[3] = false
                             })
