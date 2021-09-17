@@ -14,6 +14,7 @@ struct ContentView: View {
     @State private var count = -1
     @State private var highScore = 0
     @State private var highlight = [false, false, false, false, false]
+    @State private var startButton = true
     @State var audioPlayer: AVAudioPlayer?
     var body: some View {
         ZStack(alignment: .center)
@@ -26,7 +27,6 @@ struct ContentView: View {
                         .opacity(highlight[0] ? 1 : 0.4)
                         .onTapGesture {
                             options = 1
-                            count += 1
                             playAudio(name: "0")
                             click()
                             highlight[0] = true
@@ -39,7 +39,6 @@ struct ContentView: View {
                         .opacity(highlight[2] ? 1 : 0.4)
                         .onTapGesture {
                             options = 3
-                            count += 1
                             playAudio(name: "2")
                             click()
                             highlight[2] = true
@@ -54,7 +53,6 @@ struct ContentView: View {
                         .opacity(highlight[1] ? 1 : 0.4)
                         .onTapGesture {
                             options = 2
-                            count += 1
                             playAudio(name: "1")
                             click()
                             highlight[1] = true
@@ -67,7 +65,6 @@ struct ContentView: View {
                         .opacity(highlight[3] ? 1 : 0.4)
                         .onTapGesture {
                             options = 4
-                            count += 1
                             playAudio(name: "3")
                             click()
                             highlight[3] = true
@@ -83,6 +80,15 @@ struct ContentView: View {
                 .frame(width: 250, height: 250)
                 .background(Circle().fill(Color.black))
                 .font(Font.custom("impact", size: 72))
+                .onAppear {
+                    playAudio(name: "silent") //this initializes the audioplayer and plays a silent wav, so the first click no longer lags the game
+                }
+                .onTapGesture {
+                    if(startButton == true)
+                    {
+                        click()
+                    }
+                }
                 
             .preferredColorScheme(.dark)
         }
@@ -90,11 +96,13 @@ struct ContentView: View {
     }
     func click()
     {
+        count += 1
         print("The count is \(count), ")
         print("you clicked option \(options)")
         if(count == 0)
         {
             options = 0
+            startButton = false
             answers.append(Int.random(in: 1..<5))
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 loop(times:answers.count)
@@ -131,6 +139,7 @@ struct ContentView: View {
         count = -1
         options = 0
         answers.removeAll()
+        startButton = true
         playAudio(name: "Lose")
         (highlight[0], highlight[2], highlight[1], highlight[3]) = (true, true, true, true)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
@@ -144,7 +153,6 @@ struct ContentView: View {
         func nextIteration() {
             if i < times {
                 let highlightNumber = answers[i] - 1
-                print(answers[i])
                     if(i > 0 && answers[i - 1] != answers[i]){
                         highlight[(answers[i]) - 1] = true
                         playAudio(name: "\(highlightNumber)")
