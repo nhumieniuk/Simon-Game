@@ -30,9 +30,11 @@ struct ContentView: View {
                             playAudio(name: "0")
                             click()
                             highlight[0] = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                            if(options != 0){ //the square will not unhighlight if clear() has been run (as the game has been lost and the animation of losing has to play out)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: {
                                 highlight[0] = false
                             })
+                            }
                         }
                     Rectangle()
                         .fill(Color.yellow)
@@ -42,8 +44,10 @@ struct ContentView: View {
                             playAudio(name: "2")
                             click()
                             highlight[2] = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: {
+                                if(options != 0){ //the square will not unhighlight if clear() has been run (as the game has been lost and the animation of losing has to play out)
                                 highlight[2] = false
+                                }
                             })
                         }
             }
@@ -56,8 +60,10 @@ struct ContentView: View {
                             playAudio(name: "1")
                             click()
                             highlight[1] = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: {
+                                if(options != 0){ //the square will not unhighlight if clear() has been run (as the game has been lost and the animation of losing has to play out)
                                 highlight[1] = false
+                                }
                             })
                         }
                     Rectangle()
@@ -68,25 +74,30 @@ struct ContentView: View {
                             playAudio(name: "3")
                             click()
                             highlight[3] = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: {
+                                if(options != 0){ //the square will not unhighlight if clear() has been run (as the game has been lost and the animation of losing has to play out)
                                 highlight[3] = false
+                                }
                             })
                         }
             }
         }
-            Text("Simon")
+            Text("Simon \n Highscore: \(highScore)")
                 .multilineTextAlignment(.center)
                 .padding()
                 .frame(width: 250, height: 250)
                 .background(Circle().fill(Color.black))
-                .font(Font.custom("impact", size: 72))
+                .font(Font.custom("impact", size: 40))
                 .onAppear {
                     playAudio(name: "silent") //this initializes the audioplayer and plays a silent wav, so the first click no longer lags the game
                 }
                 .onTapGesture {
                     if(startButton == true)
                     {
+                        playAudio(name: "Start")
+                        startButton = false
                         click()
+                        options = 0
                     }
                 }
                 
@@ -96,13 +107,13 @@ struct ContentView: View {
     }
     func click()
     {
-        count += 1
+        
         print("The count is \(count), ")
         print("you clicked option \(options)")
+        if(startButton == false || answers.count > 0) {
+            count += 1
         if(count == 0)
         {
-            options = 0
-            startButton = false
             answers.append(Int.random(in: 1..<5))
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 loop(times:answers.count)
@@ -111,6 +122,10 @@ struct ContentView: View {
         else{
             if(count == answers.count)
             {
+                if count > highScore
+                {
+                    highScore = count
+                }
                 if(options == answers[count - 1]){
                     answers.append(Int.random(in: 1..<5))
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -133,6 +148,7 @@ struct ContentView: View {
                 }
             }
         }
+    }
     }
     func clear()
     {
