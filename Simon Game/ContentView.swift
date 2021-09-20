@@ -26,29 +26,13 @@ struct ContentView: View {
                         .fill(Color.green)
                         .opacity(highlight[0] ? 1 : 0.4)
                         .onTapGesture {
-                            options = 1
-                            playAudio(name: "0")
-                            click()
-                            highlight[0] = true
-                            if(options != 0){ //the square will not unhighlight if clear() has been run (as the game has been lost and the animation of losing has to play out)
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: {
-                                highlight[0] = false
-                            })
-                            }
+                            click(square: 1)
                         }
                     Rectangle()
                         .fill(Color.yellow)
                         .opacity(highlight[2] ? 1 : 0.4)
                         .onTapGesture {
-                            options = 3
-                            playAudio(name: "2")
-                            click()
-                            highlight[2] = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: {
-                                if(options != 0){ //the square will not unhighlight if clear() has been run (as the game has been lost and the animation of losing has to play out)
-                                highlight[2] = false
-                                }
-                            })
+                            click(square: 3)
                         }
             }
             VStack(alignment: .leading) {
@@ -56,29 +40,13 @@ struct ContentView: View {
                         .fill(Color.red)
                         .opacity(highlight[1] ? 1 : 0.4)
                         .onTapGesture {
-                            options = 2
-                            playAudio(name: "1")
-                            click()
-                            highlight[1] = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: {
-                                if(options != 0){ //the square will not unhighlight if clear() has been run (as the game has been lost and the animation of losing has to play out)
-                                highlight[1] = false
-                                }
-                            })
+                            click(square: 2)
                         }
                     Rectangle()
                         .fill(Color.blue)
                         .opacity(highlight[3] ? 1 : 0.4)
                         .onTapGesture {
-                            options = 4
-                            playAudio(name: "3")
-                            click()
-                            highlight[3] = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: {
-                                if(options != 0){ //the square will not unhighlight if clear() has been run (as the game has been lost and the animation of losing has to play out)
-                                highlight[3] = false
-                                }
-                            })
+                            click(square: 4)
                         }
             }
         }
@@ -94,10 +62,9 @@ struct ContentView: View {
                 .onTapGesture {
                     if(startButton == true)
                     {
-                        playAudio(name: "Start")
                         startButton = false
-                        click()
-                        options = 0
+                        click(square: 0)
+                        playAudio(name: "Start")
                     }
                 }
                 
@@ -105,52 +72,57 @@ struct ContentView: View {
         }
         
     }
-    func click()
+    func click(square: Int)
     {
-        
-        print("The count is \(count), ")
-        print("you clicked option \(options)")
-        if(startButton == false || answers.count > 0) {
+        if(startButton == false || answers.count > 0) { // if the game has not been started yet don't do anything
             count += 1
-        if(count == 0)
+            if(square > 0){ //if it is a square
+                options = square
+                playAudio(name: "\(square - 1)")
+                highlight[square - 1] = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: {
+                    if(options != 0){ //the square will not unhighlight if loseAndClear() has been run (as the game has been lost and the animation of losing has to play out)
+                        highlight[square - 1] = false
+                    }
+                })
+            }
+        if(count == 0) //if the start button is pushed add a random answer
         {
             answers.append(Int.random(in: 1..<5))
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { //add a short delay so the start sound can play
                 loop(times:answers.count)
                 }
         }
         else{
-            if(count == answers.count)
+            if(count == answers.count) //if youve clicked to the end of the array
             {
-                if count > highScore
-                {
-                    highScore = count
-                }
-                if(options == answers[count - 1]){
-                    answers.append(Int.random(in: 1..<5))
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        loop(times:answers.count)
+                if(options == answers[count - 1]){ // if you got the last answer correct
+                    answers.append(Int.random(in: 1..<5)) //add another random answer
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        loop(times:answers.count) //show squares
                         }
-                    count = 0
+                    if count > highScore //if your score is higher than your highscore set it as your highscore
+                    {
+                        highScore = count
+                    }
+                    count = 0 //reset the times youve hit the squares
                 }
-                else
+                else //if you get the last square wrong you lose
                 {
-                    print("you lost" + " option: \(options) answer: \(answers[count - 1])")
-                    clear()
+                    loseAndClear()
                 }
             }
-            else
+            else //if youre still answering do nothing unless you get it wrong
             {
                 if(options != answers[count - 1])
                 {
-                    print("you lose" + " option: \(options) answer: \(answers[count - 1])")
-                    clear()
+                    loseAndClear()
                 }
             }
         }
     }
     }
-    func clear()
+    func loseAndClear() //reset everything and do everything associated with losing
     {
         count = -1
         options = 0
@@ -158,23 +130,22 @@ struct ContentView: View {
         startButton = true
         playAudio(name: "Lose")
         (highlight[0], highlight[2], highlight[1], highlight[3]) = (true, true, true, true)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
             (highlight[0], highlight[2], highlight[1], highlight[3]) = (false, false, false, false)
         })
         
     }
     
-    func loop(times: Int) {
+    func loop(times: Int) { // a recursive loop that goes through answers and highlights each button so far (idea from https://stackoverflow.com/a/49370694)
         var i = 0
         func nextIteration() {
             if i < times {
                 let highlightNumber = answers[i] - 1
-                    if(i > 0 && answers[i - 1] != answers[i]){
+                    if(i > 0 && answers[i - 1] != answers[i]){ //if the last square is not the same as the last square, then highlight the current square and play the audio associated with it
                         highlight[(answers[i]) - 1] = true
                         playAudio(name: "\(highlightNumber)")
                     }
-                    else{
-                        print(highlight[(answers[i]) - 1])
+                    else{ //if the last square IS the same, unselect the square for 50ms and rehighlight it
                         highlight[(answers[i]) - 1] = false
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: {
                            highlight[highlightNumber] = true //game crashes if highlight[(answers[i]) - 1] is used?????????? what
@@ -183,11 +154,8 @@ struct ContentView: View {
                     }
                 i += 1
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    highlight[0] = false
-                    highlight[1] = false
-                    highlight[2] = false
-                    highlight[3] = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { //after 500 ms unselect the square being shown
+                    (highlight[0], highlight[1], highlight[2], highlight[3]) = (false, false, false, false)
                     nextIteration()
                 }
             }
@@ -195,7 +163,7 @@ struct ContentView: View {
 
         nextIteration()
     }
-    func playAudio(name: String)
+    func playAudio(name: String) //put name of file in parameters and it will play it (must be wav for this specific function)
     {
         if let audioURL = Bundle.main.url(forResource: name, withExtension: "wav") {
                 do {
