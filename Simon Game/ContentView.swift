@@ -15,7 +15,8 @@ struct ContentView: View {
     @State private var highScore = 0
     @State private var highlight = [false, false, false, false, false]
     @State private var startButton = true
-    @State var audioPlayer: AVAudioPlayer?
+    @State private var startAlert = false
+    @State private var audioPlayer: AVAudioPlayer?
     var body: some View {
         ZStack(alignment: .center)
         {
@@ -58,6 +59,7 @@ struct ContentView: View {
                 .font(Font.custom("impact", size: 40))
                 .onAppear {
                     playAudio(name: "silent") //this initializes the audioplayer and plays a silent wav, so the first click no longer lags the game
+                    startAlert = true //shows an alert telling you how to start the game (line 74)
                 }
                 .onTapGesture {
                     if(startButton == true)
@@ -67,10 +69,11 @@ struct ContentView: View {
                         playAudio(name: "Start")
                     }
                 }
-                
             .preferredColorScheme(.dark)
         }
-        
+        .alert(isPresented: $startAlert) {
+            Alert(title: Text(""), message: Text("Press the circle in the middle to start the game!"), dismissButton: .default(Text("OK")))
+        }
     }
     func click(square: Int)
     {
